@@ -1,0 +1,82 @@
+name: AI standardize
+
+on:
+  workflow_call:
+    inputs:
+      task:
+        description: 'Task name to run (empty = all tasks)'
+        type: string
+        required: false
+        default: ''
+      model:
+        description: 'LLM model override (default: claude-sonnet-4-6)'
+        type: string
+        required: false
+        default: 'claude-sonnet-4-6'
+      base_url:
+        description: 'LLM base URL — any OpenAI-compatible endpoint'
+        type: string
+        required: false
+        default: 'https://api.anthropic.com/v1'
+      standardizer_ref:
+        description: 'ffreis-workflow-ai-standardizer git ref to use'
+        type: string
+        required: false
+        default: 'main'
+      dry_run:
+        description: 'Print rendered prompts without calling LLM or writing'
+        type: boolean
+        required: false
+        default: false
+    secrets:
+      LLM_API_KEY:
+        required: true
+      GH_TOKEN:
+        description: 'Token with contents:write + pull-requests:write on the calling repo'
+        required: false
+
+jobs:
+  standardize:
+    name: Run AI standardizer
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout calling repo
+        uses: actions/checkout@v4
+        with:
+          path: calling-repo
+          fetch-depth: 0    # full history needed for diff_since_agents_update
+
+      - name: Checkout standardizer
+        uses: actions/checkout@v4
+        with:
+          repository: FelipeFuhr/ffreis-workflow-ai-standardizer
+          ref: ${{ inputs.standardizer_ref }}
+          path: standardizer
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: standardizer/go.mod
+          cache: true
+          cache-dependency-path: standardizer/go.sum
+
+      - name: Build standardizer
+        run: make build
+        working-directory: standardizer
+
+      - name: Run standardizer
+        working-directory: standardizer
+        env:
+          LLM_API_KEY:  ${{ secrets.LLM_API_KEY }}
+          LLM_BASE_URL: ${{ inputs.base_url }}
+          GH_TOKEN:     ${{ secrets.GH_TOKEN || github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          ARGS="--local-dir ../calling-repo --repo-slug ${{ github.repository }}"
+          [ -n "${{ inputs.task }}" ]          && ARGS="$ARGS --task ${{ inputs.task }}"
+          [ -n "${{ inputs.model }}" ]         && ARGS="$ARGS --model ${{ inputs.model }}"
+          ${{ inputs.dry_run }} && ARGS="$ARGS --dry-run"
+          ./bin/standardizer run $ARGS
