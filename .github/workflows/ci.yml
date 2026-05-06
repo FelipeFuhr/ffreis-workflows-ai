@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  self-test:
+    name: Self-test (dry run)
+    uses: ./.github/workflows/ai-standardize.yml
+    with:
+      dry_run: true
+      task: detect-drift
+      # No LLM_API_KEY needed for dry-run
+    secrets:
+      LLM_API_KEY: placeholder-not-used-in-dry-run
+
+  actionlint:
+    name: Lint workflows
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: actionlint
+        uses: raven-actions/actionlint@v2
