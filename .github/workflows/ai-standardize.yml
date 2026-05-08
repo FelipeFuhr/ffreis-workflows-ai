@@ -38,6 +38,7 @@ on:
 
 jobs:
   standardize:
+    timeout-minutes: 15
     name: Run AI standardizer
     runs-on: ubuntu-latest
     permissions:
