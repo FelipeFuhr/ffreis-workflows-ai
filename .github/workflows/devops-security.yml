@@ -6,9 +6,6 @@ on:
   schedule:
     - cron: '0 3 * * 1'
 
-permissions:
-  contents: read
-
 jobs:
   changes:
     # Skip heavy vuln scanners (trivy/grype/osv) on docs-only changes.
@@ -33,5 +30,10 @@ jobs:
 
   gitleaks:
     name: Secret scan
+    # Mirror permissions of the called reusable workflow (general-gitleaks.yml).
+    permissions:
+      contents: read
+      actions: read
+      security-events: write
     uses: FelipeFuhr/ffreis-workflows-general/.github/workflows/general-gitleaks.yml@d9792d01b442d7f2d3d2c6855cb312d885594e0f # v1.2.1
     secrets: inherit

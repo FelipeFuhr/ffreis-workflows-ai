@@ -6,9 +6,6 @@ on:
   pull_request:
     branches: [main]
 
-permissions:
-  contents: read
-
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
@@ -16,6 +13,10 @@ concurrency:
 jobs:
   self-test:
     name: Self-test (dry run)
+    # Mirror permissions of the called reusable workflow (ai-standardize.yml standardize job).
+    permissions:
+      contents: write
+      pull-requests: write
     uses: ./.github/workflows/ai-standardize.yml
     with:
       dry_run: true
@@ -27,6 +28,9 @@ jobs:
   actionlint:
     name: Lint workflows
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
       - name: actionlint
