@@ -4,7 +4,7 @@
 AI-assisted repo maintenance. Exposes `ai-standardize.yml` which any repo can call
 to run AI-powered tasks (drift detection, documentation updates, etc.) against itself.
 
-The actual implementation lives in `devops/ffreis-workflow-ai-standardizer`.
+The actual implementation lives in the `ffreis-workflow-ai-standardizer` repo.
 This repo is just the workflow wrapper layer.
 
 ## Non-obvious rules (read before changing anything)
