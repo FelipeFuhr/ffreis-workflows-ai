@@ -3,12 +3,13 @@ name: DevOps Automation
 on:
   workflow_call:
   schedule:
-    - cron: '0 6 * * 1'  # Mondays
+    - cron: '1 10 20 * *'  # monthly scattered (was: 0 6 * * 1)
 
 jobs:
   stale:
     name: Mark stale issues and PRs
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       issues: write
       pull-requests: write

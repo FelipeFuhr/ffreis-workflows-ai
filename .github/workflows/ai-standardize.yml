@@ -39,6 +39,7 @@ jobs:
   standardize:
     name: Run AI standardizer
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       contents: write
       pull-requests: write
