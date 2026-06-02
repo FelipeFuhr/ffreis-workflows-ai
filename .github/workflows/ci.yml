@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     branches: [main]
 
 concurrency:
@@ -26,6 +27,7 @@ jobs:
       LLM_API_KEY: placeholder-not-used-in-dry-run
 
   actionlint:
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     name: Lint workflows
     runs-on: ubuntu-latest
     timeout-minutes: 15
