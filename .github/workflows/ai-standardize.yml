@@ -28,6 +28,11 @@ on:
         type: boolean
         required: false
         default: false
+      run_on_draft:
+        description: "Run even on draft PRs (default: skip on draft to save CI minutes)"
+        required: false
+        type: boolean
+        default: false
     secrets:
       LLM_API_KEY:
         required: true
@@ -37,6 +42,7 @@ on:
 
 jobs:
   standardize:
+    if: ${{ inputs.run_on_draft || vars.CI_RUN_ON_DRAFT == 'true' || github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     name: Run AI standardizer
     runs-on: ubuntu-latest
     timeout-minutes: 30
