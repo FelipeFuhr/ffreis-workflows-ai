@@ -1,10 +1,18 @@
-name: DevOps Security
+name: DevOps / Security
 
 on:
+  pull_request:
   push:
     branches: [main]
   schedule:
-    - cron: '0 3 * * 1'
+    - cron: "0 6 * * 1" # Mondays 06:00 UTC
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   changes:
@@ -30,10 +38,62 @@ jobs:
 
   gitleaks:
     name: Secret scan
-    # Mirror permissions of the called reusable workflow (general-gitleaks.yml).
     permissions:
       contents: read
       actions: read
       security-events: write
     uses: FelipeFuhr/ffreis-workflows-general/.github/workflows/general-gitleaks.yml@d9792d01b442d7f2d3d2c6855cb312d885594e0f # v1.2.1
-    secrets: inherit
+    with:
+      working-directory: "."
+      scan-history: true
+      upload-sarif: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
+
+  trivy-fs:
+    needs: changes
+    if: |
+      always() && (
+        needs.changes.result == 'skipped' ||
+        needs.changes.outputs.code == 'true'
+      )
+    permissions:
+      contents: read
+      actions: read
+      security-events: write
+    uses: FelipeFuhr/ffreis-workflows-general/.github/workflows/general-scan-trivy-fs.yml@d9792d01b442d7f2d3d2c6855cb312d885594e0f # v1.2.1
+    with:
+      scan-ref: "."
+      upload-sarif: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
+      fail-on-vuln: ${{ github.event_name != 'pull_request' }}
+
+  grype-fs:
+    needs: changes
+    if: |
+      always() && (
+        needs.changes.result == 'skipped' ||
+        needs.changes.outputs.code == 'true'
+      )
+    permissions:
+      contents: read
+      actions: read
+      security-events: write
+    uses: FelipeFuhr/ffreis-workflows-general/.github/workflows/general-scan-grype-fs.yml@d9792d01b442d7f2d3d2c6855cb312d885594e0f # v1.2.1
+    with:
+      path: "."
+      fail-on-vuln: ${{ github.event_name != 'pull_request' }}
+      upload-sarif: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
+
+  osv:
+    needs: changes
+    if: |
+      always() && (
+        needs.changes.result == 'skipped' ||
+        needs.changes.outputs.code == 'true'
+      )
+    permissions:
+      contents: read
+      actions: read
+      security-events: write
+    uses: FelipeFuhr/ffreis-workflows-general/.github/workflows/general-osv-scanner.yml@5dfbb4986ceb88f6518fa719da3a255294cf03cf # v1.0.3
+    with:
+      working-directory: "."
+      upload-sarif: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
