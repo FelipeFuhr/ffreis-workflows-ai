@@ -82,8 +82,8 @@ jobs:
           GH_TOKEN:     ${{ secrets.GH_TOKEN || github.token }}
           GITHUB_REPOSITORY: ${{ github.repository }}
         run: |
-          ARGS="--local-dir ../calling-repo --repo-slug ${{ github.repository }}"
-          [ -n "${{ inputs.task }}" ]          && ARGS="$ARGS --task ${{ inputs.task }}"
-          [ -n "${{ inputs.model }}" ]         && ARGS="$ARGS --model ${{ inputs.model }}"
-          ${{ inputs.dry_run }} && ARGS="$ARGS --dry-run"
-          ./bin/standardizer run $ARGS
+          args=("--local-dir" "../calling-repo" "--repo-slug" "${{ github.repository }}")
+          [ -n "${{ inputs.task }}" ]          && args+=("--task"  "${{ inputs.task }}")
+          [ -n "${{ inputs.model }}" ]         && args+=("--model" "${{ inputs.model }}")
+          [ "${{ inputs.dry_run }}" = "true" ] && args+=("--dry-run")
+          ./bin/standardizer run "${args[@]}"
