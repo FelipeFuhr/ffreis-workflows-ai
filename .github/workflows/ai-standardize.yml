@@ -81,9 +81,12 @@ jobs:
           LLM_BASE_URL: ${{ inputs.base_url }}
           GH_TOKEN:     ${{ secrets.GH_TOKEN || github.token }}
           GITHUB_REPOSITORY: ${{ github.repository }}
+          INPUT_TASK:   ${{ inputs.task }}
+          INPUT_MODEL:  ${{ inputs.model }}
+          INPUT_DRY_RUN: ${{ inputs.dry_run }}
         run: |
-          args=("--local-dir" "../calling-repo" "--repo-slug" "${{ github.repository }}")
-          [ -n "${{ inputs.task }}" ]          && args+=("--task"  "${{ inputs.task }}")
-          [ -n "${{ inputs.model }}" ]         && args+=("--model" "${{ inputs.model }}")
-          [ "${{ inputs.dry_run }}" = "true" ] && args+=("--dry-run")
+          args=("--local-dir" "../calling-repo" "--repo-slug" "$GITHUB_REPOSITORY")
+          [ -n "$INPUT_TASK" ]              && args+=("--task"  "$INPUT_TASK")
+          [ -n "$INPUT_MODEL" ]             && args+=("--model" "$INPUT_MODEL")
+          [ "$INPUT_DRY_RUN" = "true" ]     && args+=("--dry-run")
           ./bin/standardizer run "${args[@]}"
