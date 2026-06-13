@@ -1,14 +1,15 @@
 name: CI
 
+# Self-test: dry-runs ai-standardize.yml against this repo + lints all workflow YAML.
+# Per AGENTS.md: devops-*.yml are exempt from this self-test.
 on:
-  push:
-    branches: [main]
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
+  push:
     branches: [main]
 
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -35,13 +36,8 @@ jobs:
       LLM_API_KEY: placeholder-not-used-in-dry-run
 
   actionlint:
-    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
-    name: Lint workflows
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
     permissions:
       contents: read
-    steps:
-      - uses: actions/checkout@v4
-      - name: actionlint
-        uses: raven-actions/actionlint@v2
+    uses: FelipeFuhr/ffreis-workflows-general/.github/workflows/general-actionlint.yml@ef5f76c297dba0d2990210a905d045c826092427 # v1.4.3
+    with:
+      working-directory: "."
