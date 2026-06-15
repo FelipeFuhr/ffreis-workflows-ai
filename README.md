@@ -1,5 +1,9 @@
 # ffreis-workflows-ai
 
+<!-- ffreis-badges:start -->
+[![CI](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/FelipeFuhr/ffreis-badges/main/badges/ffreis-workflows-ai/ci.json)](https://github.com/FelipeFuhr/ffreis-workflows-ai/actions) [![Latest version](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/FelipeFuhr/ffreis-badges/main/badges/ffreis-workflows-ai/version.json)](https://github.com/FelipeFuhr/ffreis-workflows-ai/releases) [![License](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/FelipeFuhr/ffreis-badges/main/badges/ffreis-workflows-ai/license.json)](https://github.com/FelipeFuhr/ffreis-workflows-ai/blob/main/LICENSE)
+<!-- ffreis-badges:end -->
+
 Reusable GitHub Actions workflow library for AI-assisted repository maintenance in the ffreis fleet.
 
 All workflows use `on: workflow_call` and should be consumed from other repositories by pinning to a specific commit SHA.
