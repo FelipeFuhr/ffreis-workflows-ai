@@ -35,5 +35,5 @@ jobs:
       contents: read
       actions: read
       security-events: write
-    uses: ffreis-org/ffreis-workflows-general/.github/workflows/general-gitleaks.yml@287f836a726a35af37bd24561fc687f66eaeb92f # v1.7.0
+    uses: FelipeFuhr/ffreis-workflows-general/.github/workflows/general-gitleaks.yml@287f836a726a35af37bd24561fc687f66eaeb92f # v1.7.0
     secrets: inherit
