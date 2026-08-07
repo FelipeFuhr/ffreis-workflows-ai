@@ -59,19 +59,19 @@ jobs:
 
     steps:
       - name: Checkout calling repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           path: calling-repo
           fetch-depth: 0    # full history needed for diff_since_agents_update
 
       - name: Checkout standardizer
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           repository: FelipeFuhr/ffreis-workflow-ai-standardizer
           ref: ${{ inputs.standardizer_ref }}
           path: standardizer
 
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
         with:
           go-version-file: standardizer/go.mod
           cache: true
